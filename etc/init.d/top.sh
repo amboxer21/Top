@@ -5,4 +5,4 @@
 
 user=`users | awk '{print $1}'`;
 
-screen -dmS name watch -n1 /usr/local/bin/ruby /home/$user/top.rb 60 8
+screen -dmS name watch -n1 /usr/local/bin/ruby /home/$user/top.rb --cpu 60 --mem 8
