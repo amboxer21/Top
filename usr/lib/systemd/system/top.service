@@ -1,0 +1,14 @@
+[Unit]
+Description=Auto process killer
+
+[Service]
+Type=notify
+ExecStart=/bin/bash /etc/init.d/top.sh
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+RestartPreventExitStatus=255
+
+[Install]
+WantedBy=multi-user.target
