@@ -26,13 +26,16 @@ OptionParser.new do |opt|
   opt.on("--mem NUM", Integer, "Top MEM percentage to monitor.") do |m|
     @options.mem = m
   end
+  opt.on("--time NUM", Integer, "Time proc must be running before being killed.") do |t|
+    @options.time = t
+  end
 end.parse!
 
 usage if @options.cpu.nil? || @options.mem.nil?
 
 def time_of_proc(name)
   @time_arr = []
-  `ps -o etime -p $(pidof #{name})`.each_line do |time| 
+  `ps -o etime -p $(pidof #{name}) 2> /dev/null`.each_line do |time| 
     @time_arr.push time
   end
   return @time_arr[1].to_i
@@ -47,10 +50,10 @@ end
   mem  = e[2].to_i
   time = time_of_proc(name)
 
-  puts "Time: #{time}, Name: #{name}"
+  puts "Time: #{time}, Name: #{name}" if time > @options.time
 
   puts "CPU% #{cpu}, Name: #{name}" if cpu > @options.cpu 
   puts "MEM% #{mem}, Name: #{name}" if mem > @options.mem
-  puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem
-  `pkill #{name}` if cpu > @options.cpu && mem > @options.mem
+  puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem && time > @options.time
+  `pkill #{name}` if cpu > @options.cpu && mem > @options.mem && time > @options.time
 end
