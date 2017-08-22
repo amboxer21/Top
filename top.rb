@@ -30,6 +30,14 @@ end.parse!
 
 usage if @options.cpu.nil? || @options.mem.nil?
 
+def time_of_proc(name)
+  @time_arr = []
+  `ps -o etime -p $(pidof #{name})`.each_line do |time| 
+    @time_arr.push time
+  end
+  return @time_arr[1].to_i
+end
+
 @capture.each do |e|
 
   #puts "e => #{e}"
@@ -37,9 +45,12 @@ usage if @options.cpu.nil? || @options.mem.nil?
   name = e[3]
   cpu  = e[1].to_i
   mem  = e[2].to_i
+  time = time_of_proc(name)
+
+  puts "Time: #{time}, Name: #{name}"
 
   puts "CPU% #{cpu}, Name: #{name}" if cpu > @options.cpu 
   puts "MEM% #{mem}, Name: #{name}" if mem > @options.mem
-  puts "Killing processi -> #{name}" if cpu > @options.cpu && mem > @options.mem
+  puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem
   `pkill #{name}` if cpu > @options.cpu && mem > @options.mem
 end
