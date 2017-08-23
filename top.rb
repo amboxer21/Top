@@ -31,6 +31,7 @@ OptionParser.new do |opt|
   end
 end.parse!
 
+@options.time = 1 if @options.time.nil?
 usage if @options.cpu.nil? || @options.mem.nil?
 
 def time_of_proc(name)
