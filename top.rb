@@ -4,7 +4,7 @@ require 'ostruct'
 require 'optparse'
 
 def usage
-  puts "\nruby top.rb <cpu%> <mem%>\n"
+  puts "\nruby top.rb --cpu=<cpu%> --mem=<mem%>\n"
   puts "     top.rb will kill any process running if it's CPU\n"
   puts "     and MEM % is greater than both arguments provided.\n\n"
   exit
