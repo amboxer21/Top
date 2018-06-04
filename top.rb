@@ -10,15 +10,7 @@ def usage
   exit
 end
 
-@arr = []
-`top -n1`.each_line do |line|
-  @arr.push line
-end
-
-@capture = @arr.to_s.scan(/[\s\d]+(\d+)\s+[root|anthony]+\s+\w+\s+[\w\-]+\s+\w+\s+\w+\s+\w+\s\w+\s+([\w\.]+)\s+([\w\.]+)\s+[\w:\.]+\s+([\w\-]+)/)
-
 @options = OpenStruct.new
-
 OptionParser.new do |opt|
   opt.on("--cpu NUM", Integer, "Top CPU percentage to monitor.") do |c|
     @options.cpu = c
@@ -42,19 +34,17 @@ def time_of_proc(name)
   return @time_arr[1].to_i
 end
 
-@capture.each do |e|
+[`top -n1 -b`].each do |top| 
 
-  #puts "e => #{e}"
+  top.to_s.scan(/(\d+)\s(anthony|root).*(\d+\.\d+)\s+(\d+\.\d+)\s+\d:\d+\.\d+\s(\w+)/).each do |e|
   
-  name = e[3]
-  cpu  = e[1].to_i
-  mem  = e[2].to_i
-  time = time_of_proc(name)
+    pid,name,cpu,mem,p = e[0],e[1],e[2],e[3],[4];time=time_of_proc(name)
 
-  puts "Time: #{time}, Name: #{name}" if time > @options.time
+    puts "Time: #{time}, CPU% #{cpu}, %MEM: #{@mem}, Name: #{name}, PID: #{@pid}, Process: #{@p}\n" if time > @options.time
 
-  puts "CPU% #{cpu}, Name: #{name}" if cpu > @options.cpu 
-  puts "MEM% #{mem}, Name: #{name}" if mem > @options.mem
-  puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem && time > @options.time
-  `pkill #{name}` if cpu > @options.cpu && mem > @options.mem && time > @options.time
+    puts "CPU% #{cpu}, Name: #{name}" if cpu > @options.cpu 
+    puts "MEM% #{mem}, Name: #{name}" if mem > @options.mem
+    puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem && time > @options.time
+    `pkill #{name}` if cpu > @options.cpu && mem > @options.mem && time > @options.time
+  end
 end
