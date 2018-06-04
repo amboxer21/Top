@@ -36,13 +36,13 @@ end
 
 [`top -n1 -b | head -n20`].each do |top| 
 
-  top.to_s.scan(/(\d+)\s(anthony|root).*(\d+\.\d+)\s+(\d+\.\d+)\s+\d:\d+\.\d+\s(\w+)/).each do |e|
+  top.to_s.scan(/(\d+)\s(anthony|root).*\s(\d+\.\d+)\s+(\d+\.\d+)\s+\d:\d+\.\d+\s(\w+)/).each do |e|
   
     pid,name,cpu,mem,p = e[0],e[1],e[2],e[3],e[4];time=time_of_proc(p)
   
-    if time.to_i >= @options.time and mem.to_i >= @options.mem and cpu.to_i >= @options.cpu and !p.nil?
-      puts "Killing process -> #{p} with pid: #{pid.to_i}"
-      puts "Time: #{time.to_i}, CPU% #{cpu.to_i}, %MEM: #{mem.to_i}, Name: #{name}, PID: #{pid}, Process: #{p}\n"
+    if time.to_f >= @options.time and mem.to_f >= @options.mem and cpu.to_f >= @options.cpu and !p.nil?
+      puts "Killing process -> #{p} with pid: #{pid.to_f}"
+      puts "Time: #{time.to_f}, CPU% #{cpu.to_f}, %MEM: #{mem.to_f}, Name: #{name}, PID: #{pid}, Process: #{p}\n"
       #`/bin/kill -9 #{pid.to_i}` 
       `/bin/pkill #{p}` unless pid.nil? or p.nil? 
     end
