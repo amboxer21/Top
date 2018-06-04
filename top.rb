@@ -40,10 +40,11 @@ end
   
     pid,name,cpu,mem,p = e[0],e[1],e[2],e[3],e[4];time=time_of_proc(p)
   
-    if time.to_i >= @options.time and mem.to_i >= @options.mem and cpu.to_i >= @options.cpu
-      puts "Killing process -> #{p}"
+    if time.to_i >= @options.time and mem.to_i >= @options.mem and cpu.to_i >= @options.cpu and !p.nil?
+      puts "Killing process -> #{p} with pid: #{pid.to_i}"
       puts "Time: #{time.to_i}, CPU% #{cpu.to_i}, %MEM: #{mem.to_i}, Name: #{name}, PID: #{pid}, Process: #{p}\n"
-      #`pkill #{name}` if cpu.to_i > @options.cpu && mem.to_i > @options.mem && time > @options.time
+      #`/bin/kill -9 #{pid.to_i}` 
+      `/bin/pkill #{p}` unless pid.nil? or p.nil? 
     end
   end
 end
