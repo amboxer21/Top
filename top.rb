@@ -34,7 +34,7 @@ def time_of_proc(name)
   end
 end
 
-[`top -n1 -b`].each do |top| 
+[`top -n1 -b | head -n20`].each do |top| 
 
   top.to_s.scan(/(\d+)\s(anthony|root).*(\d+\.\d+)\s+(\d+\.\d+)\s+\d:\d+\.\d+\s(\w+)/).each do |e|
   
