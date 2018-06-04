@@ -12,14 +12,14 @@ end
 
 @options = OpenStruct.new
 OptionParser.new do |opt|
-  opt.on("--cpu NUM", Integer, "Top CPU percentage to monitor.") do |c|
-    @options.cpu = c
+  opt.on("--cpu NUM", Integer, "Top CPU percentage to monitor.") do |cpu|
+    @options.cpu = cpu
   end
-  opt.on("--mem NUM", Integer, "Top MEM percentage to monitor.") do |m|
-    @options.mem = m
+  opt.on("--mem NUM", Integer, "Top MEM percentage to monitor.") do |mem|
+    @options.mem = mem
   end
-  opt.on("--time NUM", Integer, "Time proc must be running before being killed.") do |t|
-    @options.time = t
+  opt.on("--time NUM", Integer, "Time proc must be running before being killed.") do |time|
+    @options.time = time
   end
 end.parse!
 
@@ -27,24 +27,23 @@ end.parse!
 usage if @options.cpu.nil? || @options.mem.nil?
 
 def time_of_proc(name)
-  @time_arr = []
-  `ps -o etime -p $(pidof #{name}) 2> /dev/null`.each_line do |time| 
-    @time_arr.push time
+  unless name == 'top'
+    [`ps -o etime -p $(pidof #{name}) 2> /dev/null`]
+      .to_s.match(/[0-9]*:[0-9]*/)
+      .to_s.split(/:/)[0]
   end
-  return @time_arr[1].to_i
 end
 
 [`top -n1 -b`].each do |top| 
 
   top.to_s.scan(/(\d+)\s(anthony|root).*(\d+\.\d+)\s+(\d+\.\d+)\s+\d:\d+\.\d+\s(\w+)/).each do |e|
   
-    pid,name,cpu,mem,p = e[0],e[1],e[2],e[3],[4];time=time_of_proc(name)
-
-    puts "Time: #{time}, CPU% #{cpu}, %MEM: #{@mem}, Name: #{name}, PID: #{@pid}, Process: #{@p}\n" if time > @options.time
-
-    puts "CPU% #{cpu}, Name: #{name}" if cpu > @options.cpu 
-    puts "MEM% #{mem}, Name: #{name}" if mem > @options.mem
-    puts "Killing process -> #{name}" if cpu > @options.cpu && mem > @options.mem && time > @options.time
-    `pkill #{name}` if cpu > @options.cpu && mem > @options.mem && time > @options.time
+    pid,name,cpu,mem,p = e[0],e[1],e[2],e[3],e[4];time=time_of_proc(p)
+  
+    if time.to_i >= @options.time and mem.to_i >= @options.mem and cpu.to_i >= @options.cpu
+      puts "Killing process -> #{p}"
+      puts "Time: #{time.to_i}, CPU% #{cpu.to_i}, %MEM: #{mem.to_i}, Name: #{name}, PID: #{pid}, Process: #{p}\n"
+      #`pkill #{name}` if cpu.to_i > @options.cpu && mem.to_i > @options.mem && time > @options.time
+    end
   end
 end
